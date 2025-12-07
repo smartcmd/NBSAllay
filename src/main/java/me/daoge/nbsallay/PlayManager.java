@@ -131,6 +131,11 @@ public class PlayManager {
         @Override
         protected void playNotes(List<Note> notes) {
             for (var note : notes) {
+                var sound = toSound(note);
+                if (sound == null) {
+                    continue;
+                }
+
                 this.player.viewSound(toSound(note), this.player.getControlledEntity().getLocation(), false);
             }
         }
