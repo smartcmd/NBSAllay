@@ -1,55 +1,23 @@
-# Allay Java Plugin Template
+# NBSAllay
 
-Welcome to the java plugin template for allay.
+Note block song player for Allay server
+
+![img.png](img.png)
 
 ## Prerequisites
 
 - Java21 or higher.
 - Allay installed.
 
-## Getting Started
+## Usage
+ 
+Command: `/nbs` (require `nbsa.command` permission)
 
-1. **Clone this Repository**
-
-```bash
-git clone https://github.com/AllayMC/JavaPluginTemplate.git
-```
-   
-2. **Navigate to the Cloned Directory**
-
-```bash
-cd JavaPluginTemplate
-```
-   
-3. **Change Plugin Information**
-
-- Rename package name from `org.allaymc.javaplugintemplate` to `your.group.name.and.pluginname`
-- Update [build.gradle.kts](build.gradle.kts) and [settings.gradle.kts](settings.gradle.kts)
-- Reload gradle
-   
-4. **Build and Run Your Plugin**
-
-```bash
-gradlew shadowJar
-```
-   
-This command will produce a `.jar` file in the `build/libs` directory. 
-Copy the `.jar` file to the `plugins` directory of your allay server.
-Start the allay server and check the logs to ensure your plugin loads and operates
-as expected.
-
-5. **Test Your Plugin in Gradle**
-
-```bash
-gradlew runServer
-```
-
-This command will start an allay server with your plugin loaded.
-Then close allay server by clicking `X` in the dashboard window.
-
-## Documentation
-
-For a deeper dive into the Allay API and its functionalities, please refer to our [documentation](https://docs.allaymc.org) (WIP).
+- `/nbs play`: Choose and play a song.
+- `/nbs pause`: Pause playing.
+- `/nbs resume`: Resume playing.
+- `/nbs stop`: Stop playing.
+- `/nbs reload`: Reload songs.
 
 ## License
 
