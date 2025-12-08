@@ -2,6 +2,7 @@ package me.daoge.nbsallay;
 
 import lombok.Getter;
 import net.raphimc.noteblocklib.data.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.nbs.model.NbsCustomInstrument;
 import net.raphimc.noteblocklib.model.Note;
 import net.raphimc.noteblocklib.model.Song;
 import net.raphimc.noteblocklib.player.SongPlayer;
@@ -140,6 +141,7 @@ public class PlayManager {
             }
         }
 
+        // TODO: support nbs custom instruments
         protected static Sound toSound(Note note) {
             var instrument = note.getInstrument();
             var name = switch (instrument) {
@@ -163,7 +165,10 @@ public class PlayManager {
             };
 
             if (name == null) {
-                NBSAllay.getInstance().getPluginLogger().warn("Unsupported instrument: {}", instrument.getClass().getName());
+                if (!(instrument instanceof NbsCustomInstrument)) {
+                    NBSAllay.getInstance().getPluginLogger().debug("Unsupported instrument: {}", instrument.getClass().getName());
+                }
+
                 return null;
             }
 
