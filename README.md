@@ -8,6 +8,7 @@ Note block song player for Allay server
 
 - Easy-to-use user interface.
 - Supports reading `.nbs`, `.mid`, `.txt`, `.mcsp`, `.mcsp2` and `.notebot` files (thanks to [NoteBlockLib](https://github.com/RaphiMC/NoteBlockLib))
+- Supports stereo sound.
 
 ## Usage
  

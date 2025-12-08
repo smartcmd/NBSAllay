@@ -5,7 +5,7 @@ plugins {
 
 group = "me.daoge.nbsallay"
 description = "Note block song player for Allay server"
-version = "0.1.2-SNAPSHOT"
+version = "0.2.0-SNAPSHOT"
 
 java {
     toolchain {
@@ -26,5 +26,6 @@ allay {
 dependencies {
     implementation(group = "net.raphimc", name = "NoteBlockLib", version = "3.1.1")
     compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.34")
+    compileOnly(group = "org.cloudburstmc.protocol", name = "bedrock-connection", version = "3.0.0.Beta11-20251201.210556-8")
     annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.34")
 }

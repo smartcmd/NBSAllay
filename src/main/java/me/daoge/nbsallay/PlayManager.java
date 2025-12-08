@@ -9,14 +9,18 @@ import net.raphimc.noteblocklib.player.SongPlayer;
 import org.allaymc.api.bossbar.BossBar;
 import org.allaymc.api.eventbus.EventHandler;
 import org.allaymc.api.eventbus.event.server.PlayerQuitEvent;
+import org.allaymc.api.math.MathUtils;
+import org.allaymc.api.math.location.Location3dc;
 import org.allaymc.api.player.Player;
 import org.allaymc.api.plugin.Plugin;
 import org.allaymc.api.server.Server;
 import org.allaymc.api.utils.TextFormat;
 import org.allaymc.api.utils.tuple.Pair;
-import org.allaymc.api.world.sound.CustomSound;
-import org.allaymc.api.world.sound.Sound;
 import org.allaymc.api.world.sound.SoundNames;
+import org.cloudburstmc.math.vector.Vector3f;
+import org.cloudburstmc.protocol.bedrock.packet.PlaySoundPacket;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 import java.util.HashMap;
 import java.util.List;
@@ -130,19 +134,66 @@ public class PlayManager {
         }
 
         @Override
+        @SuppressWarnings("ALL")
         protected void playNotes(List<Note> notes) {
             for (var note : notes) {
-                var sound = toSound(note);
-                if (sound == null) {
+                var soundName = toSoundName(note);
+                if (soundName == null) {
                     continue;
                 }
 
-                this.player.viewSound(toSound(note), this.player.getControlledEntity().getLocation(), false);
+                var soundPos = calculateSoundPos(this.player.getControlledEntity().getLocation(), note.getPanning());
+                var packet = new PlaySoundPacket();
+                packet.setSound(soundName);
+                packet.setPosition(Vector3f.from(soundPos.x(), soundPos.y(), soundPos.z()));
+                packet.setVolume(note.getVolume());
+                packet.setPitch(note.getPitch());
+
+                // Send play sound packet immediately to improve the sound quality
+                this.player.sendPacketImmediately(packet);
             }
         }
 
+        protected static Vector3dc calculateSoundPos(Location3dc playerLocation, float panning) {
+            // 1. 如果 Panning 为 0，声音直接位于玩家位置（立体声正中/头中效应）
+            if (panning == 0) {
+                return playerLocation;
+            }
+
+            // 2. 获取玩家当前的视线方向向量 (Forward Vector)
+            // MathUtils 已经处理了 Yaw/Pitch 到向量的转换
+            var direction = MathUtils.getDirectionVector(playerLocation);
+
+            // 3. 计算“右侧”方向向量 (Right Vector)
+            // 原理：视线向量(Forward) 叉乘 向上向量(Up, 0,1,0) 得到垂直于两者的右侧向量
+            var up = new Vector3d(0, 1, 0);
+            var right = new Vector3d();
+
+            direction.cross(up, right);
+
+            // 4. 归一化并计算最终偏移
+            if (right.lengthSquared() > 0) {
+                right.normalize();
+            } else {
+                // 极端情况：如果玩家完全垂直向上或向下看，叉积可能为0
+                // 此时无法判定左右，直接返回原位置
+                return playerLocation;
+            }
+
+            // 扩散距离系数 (Stereo Spread Distance)
+            // 2.0 左右的值能提供比较自然的立体声分离感，既不会太远听不见，也不会太近分不开
+            double spreadDistance = 2.0;
+
+            // 偏移量 = 右侧向量 * panning(-1~1) * 距离
+            // 如果 panning 是负数，这里会自动反向变为“左侧”
+            right.mul(panning * spreadDistance);
+
+            // 5. 计算最终坐标：玩家原坐标 + 偏移向量
+            return playerLocation.add(right, new Vector3d());
+        }
+
         // TODO: support nbs custom instruments
-        protected static Sound toSound(Note note) {
+        protected static String toSoundName(Note note) {
             var instrument = note.getInstrument();
             var name = switch (instrument) {
                 case MinecraftInstrument.HARP -> SoundNames.NOTE_HARP;
@@ -172,7 +223,7 @@ public class PlayManager {
                 return null;
             }
 
-            return new CustomSound(name, note.getVolume(), note.getPitch());
+            return name;
         }
     }
 }
