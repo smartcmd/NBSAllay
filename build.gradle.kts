@@ -5,7 +5,7 @@ plugins {
 
 group = "me.daoge.nbsallay"
 description = "Note block song player for Allay server"
-version = "0.2.0"
+version = "0.2.1-SNAPSHOT"
 
 java {
     toolchain {
